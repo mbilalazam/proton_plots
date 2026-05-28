@@ -1803,7 +1803,7 @@ TH1F* reco_p_endZ_muP     = new TH1F("reco_p_endZ_muP", "Reco Proton end Z (1#mu
 
 TH1D* recoProtonTrueID = new TH1D("recoProtonTrueID", 
     "True PDG of Reco Proton Candidates (after cuts);True Particle ID;Count", 
-    4, 0, 4);
+    6, 0, 6);
 
 	// Give an input list
 	std::ifstream caf_list(input_file_list.c_str());
@@ -3223,26 +3223,10 @@ if (sr->mc.nu[biggestMatchIndex].prim.size() < 500 &&
 
 							if (!contained_geom) continue;   // skip non-contained
 
-                            // if (r_cosZ <= 0.8) continue; // keep protons with cos>0.8
-                            // if (r_cosZ > 0.8) continue; // keep protons with cos<=0.8    
-
-                            // if (r_start.z <= 0.0) continue;  // keep only protons starting at z > 0
-
-                            // if (r_length < 30.0 || r_length > 70.0) continue; // select protons with 30–70 cm track length
-
-
-                            // if (length <= 2.0) continue;   // require proton track length > 2 cm
-
                             if (length <= 3.0) continue;   // require proton track length > 3 cm
-                            // if (length <= 3.20) continue;   // require proton track length > 2 cm
 
-                            // if (r_end.z < -7.0 || r_end.z > 7.0) continue;  // keep only ±7 cm around z = 0
-                            // if (r_end.z >= -5.0 && r_end.z <= 5.0) continue; // reject |z_end| ≤ 5 cm → keep outside 
                             if (r_end.z >= -5.0 && r_end.z <= 0.0) continue; //  reject only −z side (−5 to 0 cm):
                             if (r_cosZ <= -0.95) continue;  // rejects cosθ ≤ −0.95, keeps cosθ > −0.95
-
-                            // if (r_cosZ < -0.2 || r_cosZ > 0.2) continue; // Keep only −0.2 ≤ cosZ ≤ +0.2  (transverse protons)
-                            // if (r_cosZ < -0.05 || r_cosZ > 0.05) continue; // Keep only −0.05 ≤ cosZ ≤ +0.05  (transverse protons)
 
                             
 							// if (contained_geom) continue;    // skip contained
@@ -3250,7 +3234,7 @@ if (sr->mc.nu[biggestMatchIndex].prim.size() < 500 &&
 							nRecoProtons_matched++;
 
                             // After nRecoProtons_matched++, add:
-                            int truePDGBin = 3; // default: other
+                            int truePDGBin = 4; // default: other
                             // find best truth match
                             double maxOvlp = 0;
                             int backtrackedPDG = -1;
@@ -3267,9 +3251,11 @@ if (sr->mc.nu[biggestMatchIndex].prim.size() < 500 &&
                                         backtrackedPDG = sr->mc.nu[ixnNum].sec[partNum].pdg;
                                 }
                             }
-                            if      (abs(backtrackedPDG) == 13)   truePDGBin = 0; // muon
-                            else if (abs(backtrackedPDG) == 2212) truePDGBin = 1; // proton
-                            else if (abs(backtrackedPDG) == 211)  truePDGBin = 2; // pion
+if      (abs(backtrackedPDG) == 13)    truePDGBin = 0; // muon
+else if (abs(backtrackedPDG) == 2212)  truePDGBin = 1; // proton
+else if (abs(backtrackedPDG) == 211)   truePDGBin = 2; // pion
+else if (abs(backtrackedPDG) == 321)   truePDGBin = 3; // kaon
+else if (rock == 1)                    truePDGBin = 5; // rock
                             
                             recoProtonTrueID->Fill(truePDGBin); // new 1D histogram: what are reco protons really?
 
@@ -4554,8 +4540,10 @@ std::cout << "========================================\n\n";
 double nMuon   = recoProtonTrueID->GetBinContent(1);
 double nProton = recoProtonTrueID->GetBinContent(2);
 double nPion   = recoProtonTrueID->GetBinContent(3);
-double nOther  = recoProtonTrueID->GetBinContent(4);
-double nTotal  = nMuon + nProton + nPion + nOther;
+double nKaon   = recoProtonTrueID->GetBinContent(4);
+double nOther  = recoProtonTrueID->GetBinContent(5);
+double nRock   = recoProtonTrueID->GetBinContent(6);
+double nTotal  = nMuon + nProton + nPion + nKaon + nOther + nRock;
 
 std::cout << "\n========================================================" << std::endl;
 std::cout << "=== Reco Proton Candidate Truth Composition ===" << std::endl;
@@ -4563,7 +4551,9 @@ std::cout << "Total reco proton candidates (after cuts): " << nTotal << std::end
 std::cout << "  True Muons  (bin 0): " << nMuon   << " (" << 100.0*nMuon/nTotal   << "%)" << std::endl;
 std::cout << "  True Protons(bin 1): " << nProton << " (" << 100.0*nProton/nTotal << "%)" << std::endl;
 std::cout << "  True Pions  (bin 2): " << nPion   << " (" << 100.0*nPion/nTotal   << "%)" << std::endl;
-std::cout << "  True Other  (bin 3): " << nOther  << " (" << 100.0*nOther/nTotal  << "%)" << std::endl;
+std::cout << "  True Kaons  (bin 3): " << nKaon   << " (" << 100.0*nKaon/nTotal   << "%)" << std::endl;
+std::cout << "  True Others (bin 4): " << nOther  << " (" << 100.0*nOther/nTotal  << "%)" << std::endl;
+std::cout << "  True Rock   (bin 5): " << nRock   << " (" << 100.0*nRock/nTotal   << "%)" << std::endl;
 std::cout << "========================================================\n" << std::endl;
 
 
