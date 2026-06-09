@@ -1237,6 +1237,28 @@ TH1D* reco_matched_proton_endX    = new TH1D("reco_matched_proton_endX",   "Reco
 TH1D* reco_matched_proton_endY    = new TH1D("reco_matched_proton_endY",   "Reco-Matched Proton End Y;End Y [cm];Events", 200, -100, 300);
 TH1D* reco_matched_proton_endZ    = new TH1D("reco_matched_proton_endZ",   "Reco-Matched Proton End Z;End Z [cm];Events", 200, -100, 300);
 
+// Interaction-type breakdown of reco-matched proton length and cosL
+TH1D* reco_matched_proton_length_QE  = new TH1D("reco_matched_proton_length_QE",  "Reco-Matched Proton Length (QE);Track Length [cm];Events",  300, 0, 300);
+TH1D* reco_matched_proton_length_MEC = new TH1D("reco_matched_proton_length_MEC", "Reco-Matched Proton Length (MEC);Track Length [cm];Events", 300, 0, 300);
+TH1D* reco_matched_proton_length_RES = new TH1D("reco_matched_proton_length_RES", "Reco-Matched Proton Length (RES);Track Length [cm];Events", 300, 0, 300);
+TH1D* reco_matched_proton_length_DIS = new TH1D("reco_matched_proton_length_DIS", "Reco-Matched Proton Length (DIS);Track Length [cm];Events", 300, 0, 300);
+TH1D* reco_matched_proton_length_COH = new TH1D("reco_matched_proton_length_COH", "Reco-Matched Proton Length (COH);Track Length [cm];Events", 300, 0, 300);
+TH1D* reco_matched_proton_cosL_QE    = new TH1D("reco_matched_proton_cosL_QE",    "Reco-Matched Proton cos(#theta) (QE);cos(#theta);Events",   100, -1, 1);
+TH1D* reco_matched_proton_cosL_MEC   = new TH1D("reco_matched_proton_cosL_MEC",   "Reco-Matched Proton cos(#theta) (MEC);cos(#theta);Events",  100, -1, 1);
+TH1D* reco_matched_proton_cosL_RES   = new TH1D("reco_matched_proton_cosL_RES",   "Reco-Matched Proton cos(#theta) (RES);cos(#theta);Events",  100, -1, 1);
+TH1D* reco_matched_proton_cosL_DIS   = new TH1D("reco_matched_proton_cosL_DIS",   "Reco-Matched Proton cos(#theta) (DIS);cos(#theta);Events",  100, -1, 1);
+TH1D* reco_matched_proton_cosL_COH   = new TH1D("reco_matched_proton_cosL_COH",   "Reco-Matched Proton cos(#theta) (COH);cos(#theta);Events",  100, -1, 1);
+
+// Particle-type breakdown
+TH1D* reco_matched_proton_length_trueMuon   = new TH1D("reco_matched_proton_length_trueMuon",   "Reco-Matched Proton Length (True #mu);Track Length [cm];Events",  300, 0, 300);
+TH1D* reco_matched_proton_length_trueProton = new TH1D("reco_matched_proton_length_trueProton", "Reco-Matched Proton Length (True p);Track Length [cm];Events",    300, 0, 300);
+TH1D* reco_matched_proton_length_truePion   = new TH1D("reco_matched_proton_length_truePion",   "Reco-Matched Proton Length (True #pi);Track Length [cm];Events",  300, 0, 300);
+TH1D* reco_matched_proton_length_trueOther  = new TH1D("reco_matched_proton_length_trueOther",  "Reco-Matched Proton Length (True Other);Track Length [cm];Events",300, 0, 300);
+TH1D* reco_matched_proton_cosL_trueMuon     = new TH1D("reco_matched_proton_cosL_trueMuon",     "Reco-Matched Proton cos(#theta) (True #mu);cos(#theta);Events",   100, -1, 1);
+TH1D* reco_matched_proton_cosL_trueProton   = new TH1D("reco_matched_proton_cosL_trueProton",   "Reco-Matched Proton cos(#theta) (True p);cos(#theta);Events",     100, -1, 1);
+TH1D* reco_matched_proton_cosL_truePion     = new TH1D("reco_matched_proton_cosL_truePion",     "Reco-Matched Proton cos(#theta) (True #pi);cos(#theta);Events",   100, -1, 1);
+TH1D* reco_matched_proton_cosL_trueOther    = new TH1D("reco_matched_proton_cosL_trueOther",    "Reco-Matched Proton cos(#theta) (True Other);cos(#theta);Events", 100, -1, 1);
+
 TH1D* reco_matched_proton_momentumX = new TH1D("reco_matched_proton_momentumX",
     "Reco-Matched Proton Momentum X;P_{x} [GeV/c];Events", 100, 0, 2);
 TH1D* reco_matched_proton_momentumY = new TH1D("reco_matched_proton_momentumY",
@@ -1803,7 +1825,7 @@ TH1F* reco_p_endZ_muP     = new TH1F("reco_p_endZ_muP", "Reco Proton end Z (1#mu
 
 TH1D* recoProtonTrueID = new TH1D("recoProtonTrueID", 
     "True PDG of Reco Proton Candidates (after cuts);True Particle ID;Count", 
-    6, 0, 6);
+    4, 0, 4);
 
 	// Give an input list
 	std::ifstream caf_list(input_file_list.c_str());
@@ -3223,10 +3245,26 @@ if (sr->mc.nu[biggestMatchIndex].prim.size() < 500 &&
 
 							if (!contained_geom) continue;   // skip non-contained
 
-                            if (length <= 3.0) continue;   // require proton track length > 3 cm
+                            // if (r_cosZ <= 0.8) continue; // keep protons with cos>0.8
+                            // if (r_cosZ > 0.8) continue; // keep protons with cos<=0.8    
 
+                            // if (r_start.z <= 0.0) continue;  // keep only protons starting at z > 0
+
+                            // if (r_length < 30.0 || r_length > 70.0) continue; // select protons with 30–70 cm track length
+
+
+                            // if (length <= 2.0) continue;   // require proton track length > 2 cm
+
+                            if (length <= 3.0) continue;   // require proton track length > 3 cm
+                            // if (length <= 3.20) continue;   // require proton track length > 2 cm
+
+                            // if (r_end.z < -7.0 || r_end.z > 7.0) continue;  // keep only ±7 cm around z = 0
+                            // if (r_end.z >= -5.0 && r_end.z <= 5.0) continue; // reject |z_end| ≤ 5 cm → keep outside 
                             if (r_end.z >= -5.0 && r_end.z <= 0.0) continue; //  reject only −z side (−5 to 0 cm):
                             if (r_cosZ <= -0.95) continue;  // rejects cosθ ≤ −0.95, keeps cosθ > −0.95
+
+                            // if (r_cosZ < -0.2 || r_cosZ > 0.2) continue; // Keep only −0.2 ≤ cosZ ≤ +0.2  (transverse protons)
+                            // if (r_cosZ < -0.05 || r_cosZ > 0.05) continue; // Keep only −0.05 ≤ cosZ ≤ +0.05  (transverse protons)
 
                             
 							// if (contained_geom) continue;    // skip contained
@@ -3234,7 +3272,7 @@ if (sr->mc.nu[biggestMatchIndex].prim.size() < 500 &&
 							nRecoProtons_matched++;
 
                             // After nRecoProtons_matched++, add:
-                            int truePDGBin = 4; // default: other
+                            int truePDGBin = 3; // default: other
                             // find best truth match
                             double maxOvlp = 0;
                             int backtrackedPDG = -1;
@@ -3251,11 +3289,9 @@ if (sr->mc.nu[biggestMatchIndex].prim.size() < 500 &&
                                         backtrackedPDG = sr->mc.nu[ixnNum].sec[partNum].pdg;
                                 }
                             }
-if      (abs(backtrackedPDG) == 13)    truePDGBin = 0; // muon
-else if (abs(backtrackedPDG) == 2212)  truePDGBin = 1; // proton
-else if (abs(backtrackedPDG) == 211)   truePDGBin = 2; // pion
-else if (abs(backtrackedPDG) == 321)   truePDGBin = 3; // kaon
-else if (rock == 1)                    truePDGBin = 5; // rock
+                            if      (abs(backtrackedPDG) == 13)   truePDGBin = 0; // muon
+                            else if (abs(backtrackedPDG) == 2212) truePDGBin = 1; // proton
+                            else if (abs(backtrackedPDG) == 211)  truePDGBin = 2; // pion
                             
                             recoProtonTrueID->Fill(truePDGBin); // new 1D histogram: what are reco protons really?
 
@@ -3287,6 +3323,25 @@ else if (rock == 1)                    truePDGBin = 5; // rock
 							reco_matched_proton_cosL->Fill(r_cosZ);
 							reco_matched_proton_energy->Fill(r_energy);
 
+                            // Interaction-type fills
+                            {
+                                int cc_mode   = sr->mc.nu[biggestMatchIndex].iscc;
+                                int mode_mode = sr->mc.nu[biggestMatchIndex].mode;
+                                if (cc_mode == 1) {
+                                    if      (mode_mode == 1 || mode_mode == 1001) { reco_matched_proton_length_QE->Fill(r_length);  reco_matched_proton_cosL_QE->Fill(r_cosZ);  }
+                                    else if (mode_mode == 10)                     { reco_matched_proton_length_MEC->Fill(r_length); reco_matched_proton_cosL_MEC->Fill(r_cosZ); }
+                                    else if (mode_mode == 4)                      { reco_matched_proton_length_RES->Fill(r_length); reco_matched_proton_cosL_RES->Fill(r_cosZ); }
+                                    else if (mode_mode == 3)                      { reco_matched_proton_length_DIS->Fill(r_length); reco_matched_proton_cosL_DIS->Fill(r_cosZ); }
+                                    else if (mode_mode == 5)                      { reco_matched_proton_length_COH->Fill(r_length); reco_matched_proton_cosL_COH->Fill(r_cosZ); }
+                                }
+                            }
+
+                            // Particle-type fills (truePDGBin already computed above: 0=mu, 1=p, 2=pi, 3=other)
+                            if      (truePDGBin == 0) { reco_matched_proton_length_trueMuon->Fill(r_length);   reco_matched_proton_cosL_trueMuon->Fill(r_cosZ);   }
+                            else if (truePDGBin == 1) { reco_matched_proton_length_trueProton->Fill(r_length); reco_matched_proton_cosL_trueProton->Fill(r_cosZ); }
+                            else if (truePDGBin == 2) { reco_matched_proton_length_truePion->Fill(r_length);   reco_matched_proton_cosL_truePion->Fill(r_cosZ);   }
+                            else                      { reco_matched_proton_length_trueOther->Fill(r_length);  reco_matched_proton_cosL_trueOther->Fill(r_cosZ);  }
+                            
 							// for nusyst start
 							out_genieIdx = sr->mc.nu[biggestMatchIndex].genieIdx;
 							out_recoProtonCosL = r_cosZ;
@@ -4540,10 +4595,8 @@ std::cout << "========================================\n\n";
 double nMuon   = recoProtonTrueID->GetBinContent(1);
 double nProton = recoProtonTrueID->GetBinContent(2);
 double nPion   = recoProtonTrueID->GetBinContent(3);
-double nKaon   = recoProtonTrueID->GetBinContent(4);
-double nOther  = recoProtonTrueID->GetBinContent(5);
-double nRock   = recoProtonTrueID->GetBinContent(6);
-double nTotal  = nMuon + nProton + nPion + nKaon + nOther + nRock;
+double nOther  = recoProtonTrueID->GetBinContent(4);
+double nTotal  = nMuon + nProton + nPion + nOther;
 
 std::cout << "\n========================================================" << std::endl;
 std::cout << "=== Reco Proton Candidate Truth Composition ===" << std::endl;
@@ -4551,9 +4604,7 @@ std::cout << "Total reco proton candidates (after cuts): " << nTotal << std::end
 std::cout << "  True Muons  (bin 0): " << nMuon   << " (" << 100.0*nMuon/nTotal   << "%)" << std::endl;
 std::cout << "  True Protons(bin 1): " << nProton << " (" << 100.0*nProton/nTotal << "%)" << std::endl;
 std::cout << "  True Pions  (bin 2): " << nPion   << " (" << 100.0*nPion/nTotal   << "%)" << std::endl;
-std::cout << "  True Kaons  (bin 3): " << nKaon   << " (" << 100.0*nKaon/nTotal   << "%)" << std::endl;
-std::cout << "  True Others (bin 4): " << nOther  << " (" << 100.0*nOther/nTotal  << "%)" << std::endl;
-std::cout << "  True Rock   (bin 5): " << nRock   << " (" << 100.0*nRock/nTotal   << "%)" << std::endl;
+std::cout << "  True Other  (bin 3): " << nOther  << " (" << 100.0*nOther/nTotal  << "%)" << std::endl;
 std::cout << "========================================================\n" << std::endl;
 
 
@@ -5173,6 +5224,28 @@ std::cout << "========================================\n\n";
 reco_matched_proton_length->Write();
 reco_matched_proton_cosL->Write();
 reco_matched_proton_energy->Write();
+
+// Interaction-type
+reco_matched_proton_length_QE->Write();
+reco_matched_proton_length_MEC->Write();
+reco_matched_proton_length_RES->Write();
+reco_matched_proton_length_DIS->Write();
+reco_matched_proton_length_COH->Write();
+reco_matched_proton_cosL_QE->Write();
+reco_matched_proton_cosL_MEC->Write();
+reco_matched_proton_cosL_RES->Write();
+reco_matched_proton_cosL_DIS->Write();
+reco_matched_proton_cosL_COH->Write();
+
+// Particle-type
+reco_matched_proton_length_trueMuon->Write();
+reco_matched_proton_length_trueProton->Write();
+reco_matched_proton_length_truePion->Write();
+reco_matched_proton_length_trueOther->Write();
+reco_matched_proton_cosL_trueMuon->Write();
+reco_matched_proton_cosL_trueProton->Write();
+reco_matched_proton_cosL_truePion->Write();
+reco_matched_proton_cosL_trueOther->Write();
 
 reco_matched_proton_startX->Write();
 reco_matched_proton_startY->Write();
