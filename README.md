@@ -53,3 +53,8 @@ All plots produced by the macros listed below are documented in the technote at 
 | `plot_dataMC_proton_detector_band.C` | Plots proton kinematic data/MC comparison with detector response and TPC physics systematic uncertainty band |
 | `plot_dataMC_proton_combined_band.C` | Plots proton kinematic data/MC comparison with the combined systematic uncertainty band (GENIE + Geant4 + Detector) |
 | `plot_dataMC_proton_cosTheta_GENIE_proposed.C` | Plots the proposed Neutrino 2026 poster plot: proton cos θ data/MC comparison with GENIE systematic uncertainty band, with both absolute counts and shape-normalized versions |
+
+### Proton Kinematics — Stacked MC Distributions
+| File | Description |
+|------|-------------|
+| `plot_proton_stacked.C` | Plots stacked MC distributions of proton cos θ and track length, broken down by interaction type (QE, RES, DIS, MEC, COH) and final-state particle composition (True Proton, True Pion, True Muon, True Other) |
